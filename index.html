@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon Espace Bien-être</title>
+    <!-- Tailwind CSS CDN pour un style rapide et responsive -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Styles personnalisés pour une meilleure esthétique et pour la police Inter */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8; /* Un fond doux */
+            color: #334155; /* Couleur de texte par défaut */
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+        /* Styles pour les sections d'outils */
+        .tool-section {
+            background-color: #ffffff;
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .tool-title {
+            font-size: 1.875rem; /* text-3xl */
+            font-weight: 600; /* font-semibold */
+            color: #1e293b; /* slate-800 */
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        .btn-primary {
+            @apply bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition-colors duration-200 shadow-md;
+        }
+        .btn-secondary {
+            @apply bg-gray-200 text-gray-800 px-6 py-3 rounded-lg hover:bg-gray-300 transition-colors duration-200 shadow-md;
+        }
+        input[type="time"], input[type="number"], textarea {
+            @apply p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 w-full;
+        }
+        /* Styles spécifiques pour l'animation de respiration */
+        #breathingCircle {
+            width: 150px;
+            height: 150px;
+            background-color: #6366f1; /* indigo-500 */
+            border-radius: 50%;
+            margin: 2rem auto;
+            opacity: 0.8;
+            transition: all 4s ease-in-out; /* Durée de l'animation */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.25rem;
+        }
+        #breathingCircle.breathe-in {
+            transform: scale(1.5);
+            opacity: 1;
+        }
+        #breathingCircle.breathe-out {
+            transform: scale(1);
+            opacity: 0.8;
+        }
+        #breathingInstructions {
+            font-size: 1.25rem;
+            font-weight: 500;
+            margin-top: 1rem;
+            text-align: center;
+            color: #475569; /* slate-600 */
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- En-tête -->
+    <header class="bg-indigo-700 text-white p-4 shadow-lg">
+        <div class="container flex flex-col md:flex-row justify-between items-center">
+            <h1 class="text-3xl font-bold mb-4 md:mb-0">Mon Espace Bien-être</h1>
+            <nav>
+                <ul class="flex flex-wrap justify-center gap-4">
+                    <li><a href="#sommeil" class="hover:text-indigo-200 transition-colors duration-200">Sommeil</a></li>
+                    <li><a href="#sport" class="hover:text-indigo-200 transition-colors duration-200">Sport</a></li>
+                    <li><a href="#journal" class="hover:text-indigo-200 transition-colors duration-200">Journal</a></li>
+                    <li><a href="#stress" class="hover:text-indigo-200 transition-colors duration-200">Stress</a></li>
+                    <li><a href="#meditation" class="hover:text-indigo-200 transition-colors duration-200">Méditation</a></li>
+                    <li><a href="#habitudes" class="hover:text-indigo-200 transition-colors duration-200">Habitudes</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Contenu principal -->
+    <main class="flex-grow container py-8">
+
+        <!-- Sommeil & récupération -->
+        <section id="sommeil" class="tool-section">
+            <h2 class="tool-title">😴 Sommeil & Récupération</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="bedtime" class="block text-gray-700 text-sm font-bold mb-2">Heure du coucher :</label>
+                    <input type="time" id="bedtime" class="mb-4">
+                </div>
+                <div>
+                    <label for="waketime" class="block text-gray-700 text-sm font-bold mb-2">Heure de réveil :</label>
+                    <input type="time" id="waketime" class="mb-4">
+                </div>
+            </div>
+            <button id="calculateSleepBtn" class="btn-primary w-full md:w-auto">Calculer la durée de sommeil</button>
+            <p id="sleepResult" class="mt-4 text-lg text-center font-medium text-gray-800"></p>
+        </section>
+
+        <!-- Sport & relaxation -->
+        <section id="sport" class="tool-section">
+            <h2 class="tool-title">🏋️ Sport & Relaxation</h2>
+            <div class="flex flex-col items-center">
+                <label for="exerciseDuration" class="block text-gray-700 text-sm font-bold mb-2">Durée de l'exercice (minutes) :</label>
+                <input type="number" id="exerciseDuration" value="5" min="1" class="mb-4 max-w-xs text-center">
+                <div class="text-5xl font-bold text-indigo-600 mb-6" id="exerciseTimerDisplay">00:00</div>
+                <div class="flex gap-4">
+                    <button id="startExerciseBtn" class="btn-primary">Démarrer</button>
+                    <button id="pauseExerciseBtn" class="btn-secondary">Pause</button>
+                    <button id="resetExerciseBtn" class="btn-secondary">Réinitialiser</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Écriture & journal de bord -->
+        <section id="journal" class="tool-section">
+            <h2 class="tool-title">✍️ Écriture & Journal de Bord</h2>
+            <textarea id="journalEntry" rows="10" placeholder="Écrivez vos pensées ici..." class="mb-4"></textarea>
+            <button id="saveJournalBtn" class="btn-primary w-full">Enregistrer l'entrée</button>
+            <p class="text-sm text-gray-500 mt-2 text-center">Votre dernière entrée est sauvegardée localement.</p>
+        </section>
+
+        <!-- Santé mentale et gestion du stress -->
+        <section id="stress" class="tool-section">
+            <h2 class="tool-title">🧘 Santé Mentale & Gestion du Stress</h2>
+            <div class="flex flex-col items-center">
+                <div id="breathingCircle">Inspirez</div>
+                <p id="breathingInstructions">Cliquez sur Démarrer pour commencer un exercice de respiration.</p>
+                <div class="flex gap-4 mt-6">
+                    <button id="startBreathingBtn" class="btn-primary">Démarrer</button>
+                    <button id="stopBreathingBtn" class="btn-secondary">Arrêter</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Méditation & Pleine conscience -->
+        <section id="meditation" class="tool-section">
+            <h2 class="tool-title">🌸 Méditation & Pleine Conscience</h2>
+            <div class="flex flex-col items-center">
+                <label for="meditationDuration" class="block text-gray-700 text-sm font-bold mb-2">Durée de la méditation (minutes) :</label>
+                <input type="number" id="meditationDuration" value="10" min="1" class="mb-4 max-w-xs text-center">
+                <div class="text-5xl font-bold text-indigo-600 mb-6" id="meditationTimerDisplay">00:00</div>
+                <div class="flex gap-4">
+                    <button id="startMeditationBtn" class="btn-primary">Démarrer</button>
+                    <button id="pauseMeditationBtn" class="btn-secondary">Pause</button>
+                    <button id="resetMeditationBtn" class="btn-secondary">Réinitialiser</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Gestion d’habitudes -->
+        <section id="habitudes" class="tool-section">
+            <h2 class="tool-title">✅ Gestion d'Habitudes</h2>
+            <div class="flex flex-col md:flex-row gap-4 mb-6">
+                <input type="text" id="newHabitInput" placeholder="Ajouter une nouvelle habitude..." class="flex-grow">
+                <button id="addHabitBtn" class="btn-primary md:w-auto">Ajouter l'habitude</button>
+            </div>
+            <ul id="habitList" class="space-y-3">
+                <!-- Les habitudes seront ajoutées ici par JS -->
+            </ul>
+        </section>
+
+    </main>
+
+    <!-- Pied de page -->
+    <footer class="bg-gray-800 text-white p-6 text-center mt-8">
+        <div class="container">
+            <p>&copy; 2024 Mon Espace Bien-être. Tous droits réservés.</p>
+            <p class="text-sm mt-2">Créé avec ❤️ pour votre bien-être.</p>
+        </div>
+    </footer>
+
+    <script>
+        // --- Fonctions utilitaires ---
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+            return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+        }
+
+        // --- Sommeil & récupération ---
+        const bedtimeInput = document.getElementById('bedtime');
+        const waketimeInput = document.getElementById('waketime');
+        const calculateSleepBtn = document.getElementById('calculateSleepBtn');
+        const sleepResult = document.getElementById('sleepResult');
+
+        calculateSleepBtn.addEventListener('click', () => {
+            const bedtime = bedtimeInput.value;
+            const waketime = waketimeInput.value;
+
+            if (!bedtime || !waketime) {
+                sleepResult.textContent = "Veuillez entrer les deux heures.";
+                return;
+            }
+
+            const bedDate = new Date(`2000-01-01T${bedtime}:00`);
+            let wakeDate = new Date(`2000-01-01T${waketime}:00`);
+
+            // Si l'heure de réveil est antérieure à l'heure de coucher, cela signifie que le réveil est le lendemain.
+            if (wakeDate < bedDate) {
+                wakeDate.setDate(wakeDate.getDate() + 1);
+            }
+
+            const diffMs = wakeDate - bedDate; // Différence en millisecondes
+            const diffHours = diffMs / (1000 * 60 * 60);
+            const hours = Math.floor(diffHours);
+            const minutes = Math.round((diffHours - hours) * 60);
+
+            sleepResult.textContent = `Durée de sommeil estimée : ${hours} heures et ${minutes} minutes.`;
+        });
+
+        // --- Sport & relaxation (Minuteur) ---
+        const exerciseDurationInput = document.getElementById('exerciseDuration');
+        const exerciseTimerDisplay = document.getElementById('exerciseTimerDisplay');
+        const startExerciseBtn = document.getElementById('startExerciseBtn');
+        const pauseExerciseBtn = document.getElementById('pauseExerciseBtn');
+        const resetExerciseBtn = document.getElementById('resetExerciseBtn');
+
+        let exerciseTimer;
+        let exerciseTimeLeft = 0;
+        let exerciseIsPaused = false;
+
+        function startExerciseTimer() {
+            if (exerciseTimer) clearInterval(exerciseTimer); // Clear any existing timer
+            if (!exerciseIsPaused) {
+                exerciseTimeLeft = parseInt(exerciseDurationInput.value) * 60;
+            }
+            exerciseIsPaused = false;
+
+            exerciseTimer = setInterval(() => {
+                if (exerciseTimeLeft <= 0) {
+                    clearInterval(exerciseTimer);
+                    exerciseTimerDisplay.textContent = "Terminé !";
+                    return;
+                }
+                exerciseTimeLeft--;
+                exerciseTimerDisplay.textContent = formatTime(exerciseTimeLeft);
+            }, 1000);
+        }
+
+        function pauseExerciseTimer() {
+            clearInterval(exerciseTimer);
+            exerciseIsPaused = true;
+        }
+
+        function resetExerciseTimer() {
+            clearInterval(exerciseTimer);
+            exerciseIsPaused = false;
+            exerciseTimeLeft = parseInt(exerciseDurationInput.value) * 60;
+            exerciseTimerDisplay.textContent = formatTime(exerciseTimeLeft);
+        }
+
+        startExerciseBtn.addEventListener('click', startExerciseTimer);
+        pauseExerciseBtn.addEventListener('click', pauseExerciseTimer);
+        resetExerciseBtn.addEventListener('click', resetExerciseTimer);
+        exerciseDurationInput.addEventListener('change', resetExerciseTimer); // Reset when duration changes
+        // Initial display
+        exerciseTimerDisplay.textContent = formatTime(parseInt(exerciseDurationInput.value) * 60);
+
+        // --- Écriture & journal de bord ---
+        const journalEntry = document.getElementById('journalEntry');
+        const saveJournalBtn = document.getElementById('saveJournalBtn');
+
+        // Charger la dernière entrée au chargement de la page
+        window.addEventListener('load', () => {
+            const savedEntry = localStorage.getItem('journalEntry');
+            if (savedEntry) {
+                journalEntry.value = savedEntry;
+            }
+        });
+
+        saveJournalBtn.addEventListener('click', () => {
+            const currentEntry = journalEntry.value;
+            localStorage.setItem('journalEntry', currentEntry);
+            alertMessage("Votre entrée a été sauvegardée !", "success"); // Utilisation d'une alerte personnalisée
+        });
+
+        // --- Santé mentale et gestion du stress (Exercice de respiration) ---
+        const breathingCircle = document.getElementById('breathingCircle');
+        const breathingInstructions = document.getElementById('breathingInstructions');
+        const startBreathingBtn = document.getElementById('startBreathingBtn');
+        const stopBreathingBtn = document.getElementById('stopBreathingBtn');
+
+        let breathingInterval;
+        let isBreathingActive = false;
+
+        function startBreathingExercise() {
+            if (isBreathingActive) return;
+            isBreathingActive = true;
+            breathingCircle.textContent = "Inspirez";
+            breathingCircle.classList.add('breathe-in');
+            breathingInstructions.textContent = "Inspirez profondément...";
+
+            let step = 0;
+            breathingInterval = setInterval(() => {
+                step++;
+                if (step % 2 === 1) {
+                    breathingCircle.classList.remove('breathe-in');
+                    breathingCircle.classList.add('breathe-out');
+                    breathingCircle.textContent = "Expirez";
+                    breathingInstructions.textContent = "Expirez lentement...";
+                } else {
+                    breathingCircle.classList.remove('breathe-out');
+                    breathingCircle.classList.add('breathe-in');
+                    breathingCircle.textContent = "Inspirez";
+                    breathingInstructions.textContent = "Inspirez profondément...";
+                }
+            }, 4000); // 4 seconds for each phase (in/out)
+        }
+
+        function stopBreathingExercise() {
+            clearInterval(breathingInterval);
+            isBreathingActive = false;
+            breathingCircle.classList.remove('breathe-in', 'breathe-out');
+            breathingCircle.textContent = "Prêt";
+            breathingInstructions.textContent = "Cliquez sur Démarrer pour commencer un exercice de respiration.";
+        }
+
+        startBreathingBtn.addEventListener('click', startBreathingExercise);
+        stopBreathingBtn.addEventListener('click', stopBreathingExercise);
+
+        // --- Méditation & Pleine conscience (Minuteur) ---
+        const meditationDurationInput = document.getElementById('meditationDuration');
+        const meditationTimerDisplay = document.getElementById('meditationTimerDisplay');
+        const startMeditationBtn = document.getElementById('startMeditationBtn');
+        const pauseMeditationBtn = document.getElementById('pauseMeditationBtn');
+        const resetMeditationBtn = document.getElementById('resetMeditationBtn');
+
+        let meditationTimer;
+        let meditationTimeLeft = 0;
+        let meditationIsPaused = false;
+
+        function startMeditationTimer() {
+            if (meditationTimer) clearInterval(meditationTimer);
+            if (!meditationIsPaused) {
+                meditationTimeLeft = parseInt(meditationDurationInput.value) * 60;
+            }
+            meditationIsPaused = false;
+
+            meditationTimer = setInterval(() => {
+                if (meditationTimeLeft <= 0) {
+                    clearInterval(meditationTimer);
+                    meditationTimerDisplay.textContent = "Méditation terminée !";
+                    alertMessage("Votre méditation est terminée !", "info"); // Alerte personnalisée
+                    return;
+                }
+                meditationTimeLeft--;
+                meditationTimerDisplay.textContent = formatTime(meditationTimeLeft);
+            }, 1000);
+        }
+
+        function pauseMeditationTimer() {
+            clearInterval(meditationTimer);
+            meditationIsPaused = true;
+        }
+
+        function resetMeditationTimer() {
+            clearInterval(meditationTimer);
+            meditationIsPaused = false;
+            meditationTimeLeft = parseInt(meditationDurationInput.value) * 60;
+            meditationTimerDisplay.textContent = formatTime(meditationTimeLeft);
+        }
+
+        startMeditationBtn.addEventListener('click', startMeditationTimer);
+        pauseMeditationBtn.addEventListener('click', pauseMeditationTimer);
+        resetMeditationBtn.addEventListener('click', resetMeditationTimer);
+        meditationDurationInput.addEventListener('change', resetMeditationTimer);
+        // Initial display
+        meditationTimerDisplay.textContent = formatTime(parseInt(meditationDurationInput.value) * 60);
+
+        // --- Gestion d’habitudes ---
+        const newHabitInput = document.getElementById('newHabitInput');
+        const addHabitBtn = document.getElementById('addHabitBtn');
+        const habitList = document.getElementById('habitList');
+
+        let habits = JSON.parse(localStorage.getItem('habits')) || [];
+
+        function renderHabits() {
+            habitList.innerHTML = '';
+            habits.forEach((habit, index) => {
+                const li = document.createElement('li');
+                li.className = 'flex items-center justify-between bg-gray-50 p-3 rounded-lg shadow-sm';
+                li.innerHTML = `
+                    <div class="flex items-center">
+                        <input type="checkbox" id="habit-${index}" ${habit.completed ? 'checked' : ''} class="mr-3 h-5 w-5 text-indigo-600 rounded focus:ring-indigo-500">
+                        <label for="habit-${index}" class="text-lg ${habit.completed ? 'line-through text-gray-500' : 'text-gray-800'}">${habit.text}</label>
+                    </div>
+                    <button data-index="${index}" class="delete-habit-btn text-red-500 hover:text-red-700 transition-colors duration-200 ml-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                    </button>
+                `;
+                habitList.appendChild(li);
+            });
+            attachHabitListeners();
+        }
+
+        function attachHabitListeners() {
+            document.querySelectorAll('.delete-habit-btn').forEach(button => {
+                button.onclick = (e) => {
+                    const index = parseInt(e.currentTarget.dataset.index);
+                    habits.splice(index, 1);
+                    localStorage.setItem('habits', JSON.stringify(habits));
+                    renderHabits();
+                };
+            });
+
+            document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                checkbox.onchange = (e) => {
+                    const index = parseInt(e.currentTarget.id.split('-')[1]);
+                    habits[index].completed = e.currentTarget.checked;
+                    localStorage.setItem('habits', JSON.stringify(habits));
+                    renderHabits(); // Re-render to apply line-through style
+                };
+            });
+        }
+
+        addHabitBtn.addEventListener('click', () => {
+            const newHabitText = newHabitInput.value.trim();
+            if (newHabitText) {
+                habits.push({ text: newHabitText, completed: false });
+                localStorage.setItem('habits', JSON.stringify(habits));
+                newHabitInput.value = '';
+                renderHabits();
+            }
+        });
+
+        // Charger et afficher les habitudes au démarrage
+        renderHabits();
+
+        // --- Système de message personnalisé (remplace alert()) ---
+        function alertMessage(message, type = "info", duration = 3000) {
+            let messageBox = document.getElementById('customMessageBox');
+            if (!messageBox) {
+                messageBox = document.createElement('div');
+                messageBox.id = 'customMessageBox';
+                messageBox.className = 'fixed bottom-5 right-5 p-4 rounded-lg shadow-lg text-white z-50 transition-all duration-300 transform translate-y-full opacity-0';
+                document.body.appendChild(messageBox);
+            }
+
+            messageBox.textContent = message;
+            messageBox.classList.remove('bg-green-500', 'bg-blue-500', 'bg-red-500');
+
+            if (type === "success") {
+                messageBox.classList.add('bg-green-500');
+            } else if (type === "info") {
+                messageBox.classList.add('bg-blue-500');
+            } else if (type === "error") {
+                messageBox.classList.add('bg-red-500');
+            } else {
+                messageBox.classList.add('bg-gray-700'); // Default
+            }
+
+            // Show message
+            messageBox.classList.remove('translate-y-full', 'opacity-0');
+            messageBox.classList.add('translate-y-0', 'opacity-100');
+
+            // Hide message after duration
+            setTimeout(() => {
+                messageBox.classList.remove('translate-y-0', 'opacity-100');
+                messageBox.classList.add('translate-y-full', 'opacity-0');
+            }, duration);
+        }
+    </script>
+</body>
+</html>
